@@ -1,12 +1,12 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search, Package, AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
 import Navigation from "@/components/Navigation";
-import DeliveryCard from "@/components/DeliveryCard";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import SoftwareSearch from "@/components/SoftwareSearch";
+import SoftwareInfo from "@/components/SoftwareInfo";
+import DeliveryStats from "@/components/DeliveryStats";
+import DeliveryDetails from "@/components/DeliveryDetails";
+import EmptyState from "@/components/EmptyState";
 
 const DeliveryStatus = () => {
   const [searchParams] = useSearchParams();
@@ -110,153 +110,26 @@ const DeliveryStatus = () => {
           <p className="text-gray-600">輸入軟體ID來查詢詳細的派送狀況</p>
         </div>
 
-        {/* 搜尋區域 */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              軟體ID查詢
-            </CardTitle>
-            <CardDescription>
-              請輸入要查詢的軟體ID (例如: sw-001, sw-002)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Input
-                  placeholder="輸入軟體ID..."
-                  value={softwareId}
-                  onChange={(e) => setSoftwareId(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                />
-              </div>
-              <Button 
-                onClick={handleSearch}
-                disabled={!softwareId || loading}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                {loading ? "查詢中..." : "查詢"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <SoftwareSearch
+          softwareId={softwareId}
+          setSoftwareId={setSoftwareId}
+          onSearch={handleSearch}
+          loading={loading}
+        />
 
-        {/* 軟體資訊和統計 */}
         {deliveryData && (
           <>
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  軟體資訊
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">軟體名稱</p>
-                    <p className="font-semibold">{deliveryData.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">版本</p>
-                    <Badge variant="secondary">v{deliveryData.version}</Badge>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">擁有者</p>
-                    <p className="font-semibold">{deliveryData.owner}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">上架時間</p>
-                    <p className="font-semibold">
-                      {new Date(deliveryData.publishedAt).toLocaleDateString('zh-TW')}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 派送統計 */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">總派送數</p>
-                      <p className="text-2xl font-bold">{deliveryData.deliveries.length}</p>
-                    </div>
-                    <Package className="h-8 w-8 text-blue-600" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">已安裝</p>
-                      <p className="text-2xl font-bold text-green-600">{statusStats.installed}</p>
-                    </div>
-                    <CheckCircle className="h-8 w-8 text-green-600" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">等待中</p>
-                      <p className="text-2xl font-bold text-yellow-600">{statusStats.pending}</p>
-                    </div>
-                    <Clock className="h-8 w-8 text-yellow-600" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">失敗</p>
-                      <p className="text-2xl font-bold text-red-600">{statusStats.failed}</p>
-                    </div>
-                    <XCircle className="h-8 w-8 text-red-600" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* 派送詳情 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>派送詳情</CardTitle>
-                <CardDescription>
-                  所有用戶的安裝狀態詳細資訊
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {deliveryData.deliveries.map((delivery: any, index: number) => (
-                    <DeliveryCard key={index} delivery={delivery} />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <SoftwareInfo deliveryData={deliveryData} />
+            <DeliveryStats
+              statusStats={statusStats}
+              totalDeliveries={deliveryData.deliveries.length}
+            />
+            <DeliveryDetails deliveries={deliveryData.deliveries} />
           </>
         )}
 
-        {/* 查詢結果為空 */}
         {!loading && softwareId && !deliveryData && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <AlertCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">找不到軟體</h3>
-              <p className="text-gray-600">
-                軟體ID "{softwareId}" 不存在，請檢查輸入是否正確
-              </p>
-            </CardContent>
-          </Card>
+          <EmptyState softwareId={softwareId} />
         )}
       </main>
     </div>
