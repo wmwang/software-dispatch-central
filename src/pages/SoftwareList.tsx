@@ -1,6 +1,6 @@
 
 import { useState, useMemo } from "react";
-import { Search, Filter, Calendar } from "lucide-react";
+import { Search, Filter, Calendar, Package } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import SoftwareCard from "@/components/SoftwareCard";
 import { Input } from "@/components/ui/input";
