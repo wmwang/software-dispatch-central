@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Package, AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
@@ -102,7 +101,7 @@ const DeliveryStatus = () => {
   const statusStats = getStatusStats();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-blue-50">
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">
